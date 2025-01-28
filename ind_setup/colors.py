@@ -12,7 +12,7 @@ import plotly.colors
 
 
 
-def get_default_line_colors():
+def get_df_col():
     """
     Returns the default line colors for plotting.
 
