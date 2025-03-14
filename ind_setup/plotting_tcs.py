@@ -25,16 +25,16 @@ def get_storm_linestyle(vel):
 
 def get_storm_color(categ):
 
-    dcs = {
-        0 : 'green',
-        1 : 'yellow',
-        2 : 'orange',
-        3 : 'red',
-        4 : 'purple',
-        5 : 'black',
-    }
-
-    return dcs[categ]
+	dcs = {
+		-1: 'lightgrey',
+		0: 'green',
+		1: 'yellow',
+		2: 'orange',
+		3: 'red',
+		4: 'purple',
+		5: 'black',
+	}
+	return dcs[categ]
 
 
 def Plot_TCs_HistoricalTracks_Category(xds_TCs_r1, cat,
@@ -73,7 +73,7 @@ def Plot_TCs_HistoricalTracks_Category(xds_TCs_r1, cat,
         lon = xds_TCs_r1.isel(storm=s)[nm_lon].values[:]
         lon[lon < 0] += 360  # Convert to 0-360 if needed
 
-        # Plot storm track
+		# Plot storm track
         ax.plot(
             lon, xds_TCs_r1.isel(storm=s)[nm_lat].values[:],
             '-', color=get_storm_color(int(cat[s].values)),

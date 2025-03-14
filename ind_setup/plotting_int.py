@@ -9,6 +9,10 @@ import plotly.colors
 
 from scipy.stats import linregress
 
+import plotly.io as pio
+from PIL import Image
+import io
+
 from .colors import get_df_col, plotting_style
 from .core import fontsize
 
@@ -17,28 +21,23 @@ line_colors = get_df_col()
 plotting_style()
 
 
-def plot_timeseries_interactive(dict_plot, scatter_dict = None, trendline = False, ylims = None, figsize = (20, 5)):
-    
+def plot_timeseries_interactive(dict_plot, scatter_dict=None, trendline=False, ylims=None, figsize=(20, 5),
+                               return_trend=False, label_yaxes=None):
     """
-    Plots interactive time series data with optional scatter plots and trendlines.
+    Plots interactive timeseries data with optional scatter plots and trendlines.
 
     Parameters:
-    - dict_plot (list): List of dictionaries containing information about the line plots.
-        Each dictionary should have the following keys:
-            - 'data' (pandas.DataFrame): Time series data.
-            - 'var' (str): Variable to be plotted on the y-axis.
-            - 'label' (str): Label for the legend.
-            - 'ax' (int): Axis number (1 or 2) to plot the data on.
-    - scatter_dict (list, optional): List of dictionaries containing information about the scatter plots.
-        Each dictionary should have the following keys:
-            - 'data' (pandas.DataFrame): Time series data.
-            - 'var' (str): Variable to be plotted on the y-axis.
-            - 'label' (str): Label for the legend.
-    - trendline (bool, optional): Whether to plot trendlines for each line plot. Default is False.
-    - ylims (tuple, optional): Tuple of y-axis limits for the line plots. Default is None.
+    - dict_plot (list): List of dictionaries containing the data and settings for each line plot.
+    - scatter_dict (list, optional): List of dictionaries containing the data and settings for each scatter plot. Default is None.
+    - trendline (bool, optional): Flag indicating whether to include trendlines. Default is False.
+    - ylims (tuple, optional): Tuple specifying the y-axis limits. Default is None.
+    - figsize (tuple, optional): Tuple specifying the figure size. Default is (20, 5).
+    - return_trend (bool, optional): Flag indicating whether to return the trendline data. Default is False.
+    - label_yaxes (str, optional): Label for the y-axis. Default is None.
 
     Returns:
-    - fig (plotly.graph_objects.Figure): Interactive plotly figure object.
+    - fig (plotly.graph_objects.Figure): The plotly figure object.
+    - TRENDS (list): List of trendline data if return_trend is True, otherwise an empty list.
     """
     
     # Create a figure with two y-axes (secondary_y=True)
@@ -47,6 +46,7 @@ def plot_timeseries_interactive(dict_plot, scatter_dict = None, trendline = Fals
     c = 0  # Color index to cycle through the color palette
 
     # Loop through each entry in the input list to plot data
+    TRENDS = []
     for entry in dict_plot:  
         # Determine if the trace will be plotted on the secondary y-axis
         secondary = entry['ax'] == 2
@@ -64,29 +64,37 @@ def plot_timeseries_interactive(dict_plot, scatter_dict = None, trendline = Fals
 
         if trendline:
             # Add a trendline if applicable
-            trendline_data = plot_trendline_interactive(entry['data'], entry['var'])  # Get trendline data
-            if trendline_data:  # If a trendline is returned, add it to the plot
-                fig.add_trace(
-                    go.Scatter(
-                        x=trendline_data['x'],  # Trendline x values
-                        y=trendline_data['y'],  # Trendline y values
-                        mode='lines',  # Display as a line
-                        line=trendline_data['line'],  # Trendline styling
-                        name=trendline_data['name'],  # Label for trendline in the legend
-                        showlegend=True  # Do not show the trendline in the legend
-                    ),
-                    secondary_y=secondary  # Attach to the secondary y-axis if needed
-                )
+            try:
+                tr = entry['trendline']
+            except:
+                tr = True
+            if tr:
+                if return_trend:
+                    trendline_data, trend = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend)  # Get trendline data
+                    TRENDS.append(trend)
+                else:
+                    trendline_data = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend)
+                if trendline_data:  # If a trendline is returned, add it to the plot
+                    fig.add_trace(
+                        go.Scatter(
+                            x=trendline_data['x'],  # Trendline x values
+                            y=trendline_data['y'],  # Trendline y values
+                            mode='lines',  # Display as a line
+                            line=trendline_data['line'],  # Trendline styling
+                            name=trendline_data['name'],  # Label for trendline in the legend
+                            showlegend=True  # Do not show the trendline in the legend
+                        ),
+                        secondary_y=secondary  # Attach to the secondary y-axis if needed
+                    )
 
         c += 1  # Increment color index for the next trace
 
         # Update y-axis labels
         if entry['ax'] == 1:
-            # fig.update_yaxes(title_text=dict_plot[0]['var'], secondary_y=False)
-            fig.update_yaxes(title_text=entry['var'], secondary_y=False)
+            yaxis_title = label_yaxes if label_yaxes is not None else entry['var']
+            fig.update_yaxes(title_text=yaxis_title, secondary_y=False)
         elif entry['ax'] == 2:
             fig.update_yaxes(title_text=entry['var'], secondary_y=True)
-            # fig.update_yaxes(title_text=dict_plot[0]['var'], secondary_y=True)
 
     if scatter_dict:
 
@@ -134,11 +142,14 @@ def plot_timeseries_interactive(dict_plot, scatter_dict = None, trendline = Fals
 
     # Display the plot
     fig.show()
+    # plt.show()
 
-    return fig
+    return (fig, TRENDS) if return_trend else fig
 
 
-def plot_trendline_interactive(data, var):
+
+
+def plot_trendline_interactive(data, var, return_trend = False):
     """
     Fits and returns a linear trendline for the specified variable in the data.
 
@@ -162,13 +173,17 @@ def plot_trendline_interactive(data, var):
     trendline = np.poly1d(coefficients)  # Create a polynomial function for the trendline
 
     _, _, _, p_value, _ = linregress(time_num, data.values)
+
+    #Since time is in seconds:
+    change_rate = coefficients[0] * 3600 * 24 * 365
+
     if p_value < 0.05:
         trendline_trace = go.Scatter(
         x=data.index,  # Trendline x values (original time index)
         y=trendline(time_num),  # Trendline y values based on the fit
         mode='lines',  # Display as a line
         line=dict(color='black'),
-        name = 'Trendline - Significant (p < 0.05)'
+        name = f'Trend (rate = {np.round(change_rate, 3)}/year) - Significant (p < 0.05)'
     )
     else:
         trendline_trace = go.Scatter(
@@ -176,12 +191,10 @@ def plot_trendline_interactive(data, var):
         y=trendline(time_num),  # Trendline y values based on the fit
         mode='lines',  # Display as a line
         line=dict(color='black', dash='dot'),  # Black dotted line for the trendline
-        name = 'Trendline - Not Significant (p > 0.05)'
+        name = f'Trend (rate = {np.round(change_rate, 3)}/year) - Not Significant (p > 0.05)'
         )
-  
 
-    return trendline_trace  # Return the trendline trace to be added to the plot
-
+    return (trendline_trace, np.round(change_rate, 3)) if return_trend else trendline_trace
 
 def plot_oni_index_th(df1, lims = [-.5, .5]):
     """
@@ -255,3 +268,23 @@ def plot_oni_index_th(df1, lims = [-.5, .5]):
 
     # Show the plot
     fig.show()
+
+
+def fig_int_to_glue(fig):
+    """
+    Converts an interactive plotly  figure to a PIL image and returns it.
+
+    Parameters:
+    fig (matplotlib.figure.Figure): The interactive plotly figure to convert.
+
+    Returns:
+    PIL.Image.Image: The converted PIL image.
+    """
+    # Guardar la figura en un buffer en memoria
+    img_bytes = io.BytesIO()
+    pio.write_image(fig, img_bytes, format="png")
+
+    # Abrir la imagen con PIL y pasarla a glue
+    img = Image.open(img_bytes)
+
+    return img
