@@ -301,7 +301,7 @@ def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vma
 
         fig.colorbar(im, ax=axs, label=label, orientation='horizontal', shrink=0.6, 
                      pad = cbar_pad).set_label(label, fontsize = fontsize)
-    plt.show()
+    return fig
 
 def plot_oni_index(df1, lims = [-.5, .5]):
 
