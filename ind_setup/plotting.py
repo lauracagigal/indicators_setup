@@ -8,6 +8,7 @@ from scipy.stats import linregress
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib import cm
 
 from .colors import get_df_col, plotting_style
 from .core import fontsize
@@ -242,13 +243,21 @@ def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vma
     None
     """
 
-    
-    lon_range = [data_an.longitude.min().values, data_an.longitude.max().values]
-    lat_range = [data_an.latitude.min().values, data_an.latitude.max().values]
+    try:
+        lon_range = [data_an.longitude.min().values, data_an.longitude.max().values]
+        lat_range = [data_an.latitude.min().values, data_an.latitude.max().values]
 
-    a = list(data_an.dims.keys())
-    a.remove('latitude')
-    a.remove('longitude')
+        a = list(data_an.dims.keys())
+        a.remove('latitude')
+        a.remove('longitude')
+    except:
+        lon_range = [data_an.lon.min().values, data_an.lon.max().values]
+        lat_range = [data_an.lat.min().values, data_an.lat.max().values]
+
+        a = list(data_an.dims.keys())
+        a.remove('lat')
+        a.remove('lon')
+
     dim_plot = a[0]
 
     if sub_plot is None:
@@ -267,8 +276,12 @@ def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vma
         ax = axs[i]
         if i < len(data_an[dim_plot]):
             ax = plot_base_map(shp_eez=shp_eez, ax = ax)
-            im = ax.pcolor(data_year.longitude, data_year.latitude, data_year[var], transform=ccrs.PlateCarree(), 
-                           cmap=cmap, vmin=vmin, vmax=vmax)
+            try:
+                im = ax.pcolor(data_year.longitude, data_year.latitude, data_year[var], transform=ccrs.PlateCarree(), 
+                cmap=cmap, vmin=vmin, vmax=vmax)
+            except:
+                im = ax.pcolor(data_year.lon, data_year.lat, data_year[var], transform=ccrs.PlateCarree(), 
+                cmap=cmap, vmin=vmin, vmax=vmax)
             ax.set_extent([lon_range[0], lon_range[1], lat_range[0], lat_range[1]], crs=ccrs.PlateCarree())
 
             if titles is not None:
@@ -382,15 +395,41 @@ def plot_bar_probs_ONI(df2, var, y_label = ''):
     return fig
 
 
-def plot_tc_categories_trend(tcs_sel_params):
+def plot_tc_categories_trend(tcs_sel_params, trendline_plot = True):
+
+    # fig, ax = plt.subplots(1, figsize=(15, 4))
+    # df_tcs = tcs_sel_params.to_dataframe()
+    # df_tcs['year'] = df_tcs.dmin_date.dt.year
+    # df_tcs.groupby('year').category.value_counts().unstack().plot(ax = ax, kind = 'bar', stacked = True, color = ['lightgrey', 'green', 'yellow', 'orange', 'red', 'purple', 'black'])
+    # ax.set_ylabel('Counts', fontsize = 14)
+    # ax.set_xlabel('Year', fontsize = 14)
+    # ax.legend(ncols = 6).set_title('Category', prop = {'size': 12})
+
 
     fig, ax = plt.subplots(1, figsize=(15, 4))
     df_tcs = tcs_sel_params.to_dataframe()
     df_tcs['year'] = df_tcs.dmin_date.dt.year
-    df_tcs.groupby('year').category.value_counts().unstack().plot(ax = ax, kind = 'bar', stacked = True, color = ['lightgrey', 'green', 'yellow', 'orange', 'red', 'purple', 'black'])
-    ax.set_ylabel('Counts', fontsize = 14)
-    ax.set_xlabel('Year', fontsize = 14)
-    ax.legend(ncols = 6).set_title('Category', prop = {'size': 12})
+
+    # --- Define all categories and their colors ---
+    categories = [-1, 0, 1, 2, 3, 4, 5]
+    colors = ['lightgrey', 'green', 'yellow', 'orange', 'red', 'purple', 'black']
+
+    # --- Count and reindex to preserve order ---
+    counts = (df_tcs.groupby('year').category.value_counts().unstack(fill_value=0)
+        .reindex(columns=categories, fill_value=0))
+
+    # --- Ensure every year in full range appears ---
+    years = range(df_tcs['year'].min(), df_tcs['year'].max() + 1)
+    counts = counts.reindex(years, fill_value=0)
+
+    # --- Plot with colors aligned to category order ---
+    counts.plot( ax=ax, kind='bar', stacked=True,
+        color=colors
+    )
+
+    ax.set_ylabel('Counts', fontsize=14)
+    ax.set_xlabel('Year', fontsize=14)
+    ax.legend(title='Category', ncols=7, prop={'size': 12})
 
     ax.grid(':', color = 'lightgrey', alpha = 0.5)
     #trendline
@@ -407,12 +446,118 @@ def plot_tc_categories_trend(tcs_sel_params):
     change_rate = coefficients[0]
     trend = np.round(change_rate, 3)
 
+    if trendline_plot:
 
-    if p_value < 0.05:
-        label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Significant (p < 0.05)'
-        ax.plot(x, trendline(x), color='k', linestyle='-', label=label)
-    else:
-        label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Not Significant (p > 0.05)'
-        ax.plot(x, trendline(x), color='k', linestyle=':', label= label)
+        if p_value < 0.05:
+            label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Significant (p < 0.05)'
+            ax.plot(x, trendline(x), color='k', linestyle='-', label=label)
+        else:
+            label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Not Significant (p > 0.05)'
+            ax.plot(x, trendline(x), color='k', linestyle=':', label= label)
 
     ax.legend(fontsize = 12, ncol = 7)
+
+    return fig
+
+
+
+
+
+
+def plot_dhw_perpetual_year(data_crw, yeari = 1985, yeare = 2025):
+
+    fig, ax = plt.subplots(figsize = (15, 5))
+    ax2 = ax.twinx()
+    colors = cm.rainbow(np.linspace(0, 1, len(range(yeari, yeare))))
+    lw = 1
+    alpha = 0.1
+
+    for iy, y in enumerate(range(yeari, yeare)):
+
+        data_plot = data_crw.loc[f'{y}']
+
+        ax.plot(data_plot.index.dayofyear, data_plot['SST@90th_HS'],color = colors[iy], alpha = alpha, label = 'SST', lw = lw)
+
+        ax2.plot(data_plot.index.dayofyear, data_plot['DHW_from_90th_HS>1'],color = colors[iy], alpha = alpha, label = 'SST', lw = lw)
+        ax2.fill_between(data_plot.index.dayofyear, 0, data_plot['DHW_from_90th_HS>1'],color = colors[iy], alpha = .1, label = 'SST')
+
+        lw +=.015
+        alpha +=.008
+
+    ax.set_ylim(20, 32)
+    ax.set_ylabel('SST (°C)', fontsize = 14, color = 'darkgreen')
+    ax.set_xlabel('Date', fontsize = 14)
+    ax2.set_ylabel('DHW', fontsize = 14, color = 'darkred')
+    ax2.set_xlim(0, 365)
+    ax2.set_ylim(0, 15)
+
+    cbar = plt.colorbar(cm.ScalarMappable(cmap=cm.rainbow), ax = ax)
+    cbar.set_label('Year', fontsize = 14)
+    cbar.set_ticks([0, 1])
+    cbar.set_ticklabels([f'{yeari}', f'{yeare}'])
+
+    return fig, ax2
+
+
+
+
+def plot_dhw(data_crw):
+    """
+    Plot sea surface temperature (SST) and Degree Heating Weeks (DHW) time series with bleaching alert shading.
+    This function creates a Matplotlib figure that overlays SST and DHW information on twin y-axes:
+    - The primary y-axis (left) shows the SST time series and horizontal reference lines for the
+        Maximum Monthly Mean (MMM) and MMM + 1°C.
+    - The secondary y-axis (right) shows the DHW time series as a line and shaded regions
+        corresponding to bleaching alert levels.
+    Parameters
+    ----------
+    data_crw : pandas.DataFrame
+            Time-indexed DataFrame containing at minimum the following columns:
+            - 'SST@90th_HS': Sea Surface Temperature values (°C). Plotted on the left y-axis.
+            - 'DHW_from_90th_HS>1': Degree Heating Weeks values. Plotted on the right y-axis.
+            The DataFrame index should be a datetime-like index (e.g., pandas.DatetimeIndex) that
+            spans the desired plotting range. The function uses data_crw.index[0] and data_crw.index[-1]
+            to set x-axis limits and to draw horizontal lines across the full span.
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+            The created Matplotlib Figure object.
+    ax2 : matplotlib.axes.Axes
+            The secondary y-axis (twin axis) on which the DHW series and shaded alert bands are drawn.
+    """
+
+    fig, ax = plt.subplots(figsize = (15, 7))
+    data_crw['SST@90th_HS'].plot(ax = ax, color = 'lightgrey', alpha =.7, label = 'SST')
+
+    ax.hlines(29.2309, data_crw.index[0], data_crw.index[-1], color = 'darkgreen', lw = 1, 
+            linestyle = '--', label = 'Maximum Monthly Mean (MMM)')
+
+    ax.hlines(29.2309 + 1, data_crw.index[0], data_crw.index[-1], color = 'darkgreen', lw = 1, 
+            linestyle = '--', label = 'MMM + 1')
+
+    ax.set_ylabel('SST (°C)', fontsize = 14, color = 'darkgreen')
+    ax.set_xlabel('Date', fontsize = 14)
+    ax.legend(loc = 2, fontsize = 14, ncols = 1)
+
+    ax2 = ax.twinx()
+    data_crw['DHW_from_90th_HS>1'].plot(ax = ax2, color = 'darkred', lw = 1, label = 'DHW')
+
+    thrs = [0, 4, 8, 200]
+    colors = ['gold', 'orange', 'red']
+    labels = ['Bleaching warning', 'Bleaching Alert level 1', 'Bleaching Alert level 2']
+    for it, t in enumerate(thrs[:-1]):
+        dd = data_crw.copy()[['DHW_from_90th_HS>1']]
+        dd['DHW_from_90th_HS>1'] = np.where((dd['DHW_from_90th_HS>1'] > thrs[it]) & (dd['DHW_from_90th_HS>1'] <= thrs[it+1]),
+                                            dd['DHW_from_90th_HS>1'], np.nan)
+        ax2.fill_between(dd.index,0, dd['DHW_from_90th_HS>1'], color = colors[it], alpha = 0.3, label = labels[it])
+
+    ax2.legend(fontsize = 14, loc = 1)
+    # ax2.bar(x = data_crw.index, height = data_crw['DHW_from_90th_HS>1'].values, color = 'darkred', alpha = 0.5)
+    ax2.set_ylabel('DHW', fontsize = 14, color = 'darkred')
+    ax2.set_xlim(data_crw.index[0], data_crw.index[-1])
+    ax2.set_ylim(0, 15)
+
+    ax2.hlines([2, 4], data_crw.index[0], data_crw.index[-1], color = 'k', lw = 1, 
+            linestyle = ':', label = 'DHW thresholds: 2 and 4')
+    
+    return fig, ax2

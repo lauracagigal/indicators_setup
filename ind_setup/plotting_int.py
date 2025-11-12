@@ -52,15 +52,27 @@ def plot_timeseries_interactive(dict_plot, scatter_dict=None, trendline=False, y
         secondary = entry['ax'] == 2
         
         # Add the line plot trace to the figure
-        fig.add_trace(
-            go.Scatter(
-                x=entry['data'].index,  # X-axis data (time index)
-                y=entry['data'][entry['var']],  # Y-axis data (selected variable)
-                name=entry['label'],  # Label for the legend
-                line=dict(color=line_colors[c])  # Line color based on the color index
-            ),
-            secondary_y=secondary  # Attach to the secondary y-axis if needed
-        )
+
+        if 'color' in entry:
+            fig.add_trace(
+                go.Scatter(
+                    x=entry['data'].index,  # X-axis data (time index)
+                    y=entry['data'][entry['var']],  # Y-axis data (selected variable)
+                    name=entry['label'],  # Label for the legend
+                    line=dict(color=entry['color'])  # Line color based on the specified color
+                ),
+                secondary_y=secondary  # Attach to the secondary y-axis if needed
+            )
+        else:
+            fig.add_trace(
+                go.Scatter(
+                    x=entry['data'].index,  # X-axis data (time index)
+                    y=entry['data'][entry['var']],  # Y-axis data (selected variable)
+                    name=entry['label'],  # Label for the legend
+                    line=dict(color=line_colors[c])  # Line color based on the color index
+                ),
+                secondary_y=secondary  # Attach to the secondary y-axis if needed
+            )
 
         if trendline:
             # Add a trendline if applicable

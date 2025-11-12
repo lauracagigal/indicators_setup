@@ -105,7 +105,8 @@ def Plot_TCs_HistoricalTracks_Category(xds_TCs_r1, cat,
     ax.set_title('Historical TCs', fontsize=15)
     ax.legend(loc='lower left', fontsize=12)
     ax.set_aspect('equal')  # Allow automatic scaling for map aspect ratio
-    return ax
+	
+    return fig, ax
 
 
 ## Interactive Plotting
