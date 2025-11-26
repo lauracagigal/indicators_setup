@@ -216,7 +216,10 @@ def plot_base_map(shp_eez = None, ax = None, figsize=[10, 6]):
     """
 
     if ax is None:
+        ax_initial = None
         fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
+    else:
+        ax_initial = ax
 
     # Set the extent of the map
     ax.coastlines(resolution='10m')
@@ -227,7 +230,10 @@ def plot_base_map(shp_eez = None, ax = None, figsize=[10, 6]):
 
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
-    return ax
+    if ax_initial is None:
+        return fig, ax
+    else:
+        return ax
 
 
 def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vmax=.3, 
@@ -308,7 +314,7 @@ def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vma
         if var == 'o2':
             label = 'Oxygen (µmol/kg)'
         elif var == 'MD50':
-            label = 'MD50 (µm)'
+            label = 'MD50 (µm ESD)'
         else:
             label = var
 

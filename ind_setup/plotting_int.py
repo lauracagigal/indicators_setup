@@ -39,6 +39,11 @@ def plot_timeseries_interactive(dict_plot, scatter_dict=None, trendline=False, y
     - fig (plotly.graph_objects.Figure): The plotly figure object.
     - TRENDS (list): List of trendline data if return_trend is True, otherwise an empty list.
     """
+
+    if np.diff(dict_plot[0]['data'].index).astype('timedelta64[D]').astype(int)[1] == 1:
+        freq = 'day'
+    else:
+        freq = 'year'
     
     # Create a figure with two y-axes (secondary_y=True)
     fig = make_subplots(specs=[[{"secondary_y": True}]],)
@@ -82,10 +87,10 @@ def plot_timeseries_interactive(dict_plot, scatter_dict=None, trendline=False, y
                 tr = True
             if tr:
                 if return_trend:
-                    trendline_data, trend = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend)  # Get trendline data
+                    trendline_data, trend = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend, freq = freq)  # Get trendline data
                     TRENDS.append(trend)
                 else:
-                    trendline_data = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend)
+                    trendline_data = plot_trendline_interactive(entry['data'], entry['var'], return_trend = return_trend, freq = freq)
                 if trendline_data:  # If a trendline is returned, add it to the plot
                     fig.add_trace(
                         go.Scatter(
@@ -161,7 +166,7 @@ def plot_timeseries_interactive(dict_plot, scatter_dict=None, trendline=False, y
 
 
 
-def plot_trendline_interactive(data, var, return_trend = False):
+def plot_trendline_interactive(data, var, return_trend = False, freq = 'year'):
     """
     Fits and returns a linear trendline for the specified variable in the data.
 
@@ -195,7 +200,7 @@ def plot_trendline_interactive(data, var, return_trend = False):
         y=trendline(time_num),  # Trendline y values based on the fit
         mode='lines',  # Display as a line
         line=dict(color='black'),
-        name = f'Trend (rate = {np.round(change_rate, 3)}/year) - Significant (p < 0.05)'
+        name = f'Trend (rate = {np.round(change_rate, 3)}/{freq}) - Significant (p < 0.05)'
     )
     else:
         trendline_trace = go.Scatter(
@@ -203,7 +208,7 @@ def plot_trendline_interactive(data, var, return_trend = False):
         y=trendline(time_num),  # Trendline y values based on the fit
         mode='lines',  # Display as a line
         line=dict(color='black', dash='dot'),  # Black dotted line for the trendline
-        name = f'Trend (rate = {np.round(change_rate, 3)}/year) - Not Significant (p > 0.05)'
+        name = f'Trend (rate = {np.round(change_rate, 3)}/{freq}) - Not Significant (p > 0.05)'
         )
 
     return (trendline_trace, np.round(change_rate, 3)) if return_trend else trendline_trace
