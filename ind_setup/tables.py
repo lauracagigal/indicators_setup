@@ -4,301 +4,301 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def get_data_metrics(st_data, var):
-    """
-    Calculate various metrics for a given variable in a dataset.
+# def get_data_metrics(st_data, var):
+#     """
+#     Calculate various metrics for a given variable in a dataset.
 
-    Parameters:
-    st_data (pd.DataFrame): The dataset containing the variable.
-    var (str): The name of the variable to calculate metrics for.
+#     Parameters:
+#     st_data (pd.DataFrame): The dataset containing the variable.
+#     var (str): The name of the variable to calculate metrics for.
 
-    Returns:
-    pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
-    """
+#     Returns:
+#     pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
+#     """
     
-    mean = np.nanmean(st_data[var])
-    std = np.nanstd(st_data[var])
-    max_val = np.nanmax(st_data[var])
-    min_val = np.nanmin(st_data[var])
-    median = np.nanmedian(st_data[var])
-    range_val = max_val - min_val
-    trend = np.polyfit(st_data.index.year, st_data[var], 1)[0]
+#     mean = np.nanmean(st_data[var])
+#     std = np.nanstd(st_data[var])
+#     max_val = np.nanmax(st_data[var])
+#     min_val = np.nanmin(st_data[var])
+#     median = np.nanmedian(st_data[var])
+#     range_val = max_val - min_val
+#     trend = np.polyfit(st_data.index.year, st_data[var], 1)[0]
     
-    # Extreme events
-    threshold = mean + 2 * std
-    extreme_days = len(st_data[var] > threshold)
+#     # Extreme events
+#     threshold = mean + 2 * std
+#     extreme_days = len(st_data[var] > threshold)
     
-    # Percentiles
-    p10 = np.nanpercentile(st_data[var], 10)
-    p90 = np.nanpercentile(st_data[var], 90)
-    
-    
-    # Compile metrics
-    df = pd.DataFrame({
-        'Mean': mean,
-        'Median': median,
-        'Standard deviation': std,
-        'Maximum': max_val,
-        'Minimum': min_val,
-        'Range': range_val,
-        '10th Percentile': p10,
-        '90th Percentile': p90,
-        'Trend': trend,
-        'Extreme Days (>2σ)': extreme_days,
-    }, index=[var])
-    
-    return np.round(df, 3)
-
-
-def plot_df_table(df, header_fill = "lavender", header_font ="#3c453a",
-                #   cell_fill = ["#ffe4dc", "#ddeed9"], cell_font = "#3c453a",
-                  cell_fill = ["whitesmoke", "ghostwhite"], cell_font = "#3c453a",
-                  figsize = (800, 300)):
-    """
-    Plots a dataframe as a stylized table.
-
-    Parameters:
-    - df: pandas DataFrame
-        The dataframe to be plotted.
-    - header_fill: str, optional
-        The fill color for the table header. Default is "#d4b9d9".
-    - header_font: str, optional
-        The font color for the table header. Default is "#3c453a".
-    - cell_fill: list of str, optional
-        The fill colors for the table cells. Default is ["#ffe4dc", "#ddeed9"].
-    - cell_font: str, optional
-        The font color for the table cells. Default is "#3c453a".
-    - figsize: tuple, optional
-        The size of the resulting figure. Default is (800, 300).
-
-    Returns:
-    - fig: matplotlib.figure.Figure
-        The resulting figure object.
-    """
-    
-    fig = df2img.plot_dataframe(
-    df,
-    tbl_header={
-        "height": 20,
-        "line_width": 3,
-        "align": "center",
-        'fill_color': header_fill,
-        "font_color": header_font,
-    },
-    tbl_cells={
-        "align": "center",
-        "fill_color": cell_fill,
-        "font_color": cell_font,
-        "height": 30,
-        "line_width": 3,
-    }, 
-    fig_size=figsize,
-    plotly_renderer='png',)
-
-
-    return fig
-
-
-def table_temperature_summary(st_data):
-    """
-    Calculate various metrics for a given variable in a dataset.
-
-    Parameters:
-    st_data (pd.DataFrame): The dataset containing the variable.
-    var (str): The name of the variable to calculate metrics for.
-
-    Returns:
-    pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
-    """
-
-    annual_mean = np.nanmean(st_data['TMEAN'].resample('Y').mean())
-    annual_min = np.nanmin(st_data['TMEAN'].resample('Y').mean())
-    annual_max = np.nanmax(st_data['TMEAN'].resample('Y').mean())
-
-    annual_max_date = st_data['TMAX'].resample('Y').mean().idxmax().year
-    annual_max_value = st_data['TMAX'].resample('Y').mean().max()
-    annual_min_date = st_data['TMIN'].resample('Y').mean().idxmin().year
-    annual_min_value = st_data['TMIN'].resample('Y').mean().min()
+#     # Percentiles
+#     p10 = np.nanpercentile(st_data[var], 10)
+#     p90 = np.nanpercentile(st_data[var], 90)
     
     
-    # Compile metrics
-    df = pd.DataFrame({
-        'Annual Mean Temperature': annual_mean,
-        'Range of Mean Annual Temperature': str([f"{float(annual_min):.2f}", f"{float(annual_max):.2f}"]),
-        '_ _': '_ _',
-        'Minimum Temperature Year': annual_min_date,
-        'Annual Minimum Temperature': annual_min_value,
-        '__': '__',
-        'Maximum Temperature Year': annual_max_date,
-        'Annual maximum temperature': annual_max_value,
+#     # Compile metrics
+#     df = pd.DataFrame({
+#         'Mean': mean,
+#         'Median': median,
+#         'Standard deviation': std,
+#         'Maximum': max_val,
+#         'Minimum': min_val,
+#         'Range': range_val,
+#         '10th Percentile': p10,
+#         '90th Percentile': p90,
+#         'Trend': trend,
+#         'Extreme Days (>2σ)': extreme_days,
+#     }, index=[var])
+    
+#     return np.round(df, 3)
+
+
+# def plot_df_table(df, header_fill = "lavender", header_font ="#3c453a",
+#                 #   cell_fill = ["#ffe4dc", "#ddeed9"], cell_font = "#3c453a",
+#                   cell_fill = ["whitesmoke", "ghostwhite"], cell_font = "#3c453a",
+#                   figsize = (800, 300)):
+#     """
+#     Plots a dataframe as a stylized table.
+
+#     Parameters:
+#     - df: pandas DataFrame
+#         The dataframe to be plotted.
+#     - header_fill: str, optional
+#         The fill color for the table header. Default is "#d4b9d9".
+#     - header_font: str, optional
+#         The font color for the table header. Default is "#3c453a".
+#     - cell_fill: list of str, optional
+#         The fill colors for the table cells. Default is ["#ffe4dc", "#ddeed9"].
+#     - cell_font: str, optional
+#         The font color for the table cells. Default is "#3c453a".
+#     - figsize: tuple, optional
+#         The size of the resulting figure. Default is (800, 300).
+
+#     Returns:
+#     - fig: matplotlib.figure.Figure
+#         The resulting figure object.
+#     """
+    
+#     fig = df2img.plot_dataframe(
+#     df,
+#     tbl_header={
+#         "height": 20,
+#         "line_width": 3,
+#         "align": "center",
+#         'fill_color': header_fill,
+#         "font_color": header_font,
+#     },
+#     tbl_cells={
+#         "align": "center",
+#         "fill_color": cell_fill,
+#         "font_color": cell_font,
+#         "height": 30,
+#         "line_width": 3,
+#     }, 
+#     fig_size=figsize,
+#     plotly_renderer='png',)
+
+
+#     return fig
+
+
+# def table_temperature_summary(st_data):
+#     """
+#     Calculate various metrics for a given variable in a dataset.
+
+#     Parameters:
+#     st_data (pd.DataFrame): The dataset containing the variable.
+#     var (str): The name of the variable to calculate metrics for.
+
+#     Returns:
+#     pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
+#     """
+
+#     annual_mean = np.nanmean(st_data['TMEAN'].resample('Y').mean())
+#     annual_min = np.nanmin(st_data['TMEAN'].resample('Y').mean())
+#     annual_max = np.nanmax(st_data['TMEAN'].resample('Y').mean())
+
+#     annual_max_date = st_data['TMAX'].resample('Y').mean().idxmax().year
+#     annual_max_value = st_data['TMAX'].resample('Y').mean().max()
+#     annual_min_date = st_data['TMIN'].resample('Y').mean().idxmin().year
+#     annual_min_value = st_data['TMIN'].resample('Y').mean().min()
+    
+    
+#     # Compile metrics
+#     df = pd.DataFrame({
+#         'Annual Mean Temperature': annual_mean,
+#         'Range of Mean Annual Temperature': str([f"{float(annual_min):.2f}", f"{float(annual_max):.2f}"]),
+#         '_ _': '_ _',
+#         'Minimum Temperature Year': annual_min_date,
+#         'Annual Minimum Temperature': annual_min_value,
+#         '__': '__',
+#         'Maximum Temperature Year': annual_max_date,
+#         'Annual maximum temperature': annual_max_value,
        
-    }, index=['Stats'])
-    df.index.name = ' '
+#     }, index=['Stats'])
+#     df.index.name = ' '
     
-    return np.round(df, 3)
+#     return np.round(df, 3)
 
 
-def table_temperature_summary(st_data):
-    """
-    Calculate various metrics for a given variable in a dataset.
+# def table_temperature_summary(st_data):
+#     """
+#     Calculate various metrics for a given variable in a dataset.
 
-    Parameters:
-    st_data (pd.DataFrame): The dataset containing the variable.
-    var (str): The name of the variable to calculate metrics for.
+#     Parameters:
+#     st_data (pd.DataFrame): The dataset containing the variable.
+#     var (str): The name of the variable to calculate metrics for.
 
-    Returns:
-    pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
-    """
+#     Returns:
+#     pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
+#     """
 
-    annual_mean = np.nanmean(st_data['TMEAN'].resample('Y').mean())
-    annual_min = np.nanmin(st_data['TMEAN'].resample('Y').mean())
-    annual_max = np.nanmax(st_data['TMEAN'].resample('Y').mean())
+#     annual_mean = np.nanmean(st_data['TMEAN'].resample('Y').mean())
+#     annual_min = np.nanmin(st_data['TMEAN'].resample('Y').mean())
+#     annual_max = np.nanmax(st_data['TMEAN'].resample('Y').mean())
 
-    annual_max_date = st_data['TMAX'].resample('Y').mean().idxmax().year
-    annual_max_value = st_data['TMAX'].resample('Y').mean().max()
-    annual_min_date = st_data['TMIN'].resample('Y').mean().idxmin().year
-    annual_min_value = st_data['TMIN'].resample('Y').mean().min()
+#     annual_max_date = st_data['TMAX'].resample('Y').mean().idxmax().year
+#     annual_max_value = st_data['TMAX'].resample('Y').mean().max()
+#     annual_min_date = st_data['TMIN'].resample('Y').mean().idxmin().year
+#     annual_min_value = st_data['TMIN'].resample('Y').mean().min()
     
     
-    # Compile metrics
-    df = pd.DataFrame({
+#     # Compile metrics
+#     df = pd.DataFrame({
 
-        'Warmest day on record': st_data['TMAX'].idxmax().strftime('%Y-%m-%d'),
-        'Coldest day on record': st_data['TMIN'].idxmin().strftime('%Y-%m-%d'),
+#         'Warmest day on record': st_data['TMAX'].idxmax().strftime('%Y-%m-%d'),
+#         'Coldest day on record': st_data['TMIN'].idxmin().strftime('%Y-%m-%d'),
 
-        'Annual Mean Temperature': annual_mean,
-        'Range of Mean Annual Temperature': str([f"{float(annual_min):.2f}", f"{float(annual_max):.2f}"]),
-        '_ _': '_ _',
-        'Minimum Temperature Year': annual_min_date,
-        'Annual Minimum Temperature': annual_min_value,
-        '__': '__',
-        'Maximum Temperature Year': annual_max_date,
-        'Annual maximum temperature': annual_max_value,
+#         'Annual Mean Temperature': annual_mean,
+#         'Range of Mean Annual Temperature': str([f"{float(annual_min):.2f}", f"{float(annual_max):.2f}"]),
+#         '_ _': '_ _',
+#         'Minimum Temperature Year': annual_min_date,
+#         'Annual Minimum Temperature': annual_min_value,
+#         '__': '__',
+#         'Maximum Temperature Year': annual_max_date,
+#         'Annual maximum temperature': annual_max_value,
        
-    }, index=['Stats'])
-    df.index.name = ' '
+#     }, index=['Stats'])
+#     df.index.name = ' '
     
-    return np.round(df, 3)
+#     return np.round(df, 3)
 
 
 
-def table_hot_cold_summary(annual_hot, annual_cold, TRENDS):
-    """
-    Calculate various metrics for a given variable in a dataset.
+# def table_hot_cold_summary(annual_hot, annual_cold, TRENDS):
+#     """
+#     Calculate various metrics for a given variable in a dataset.
 
-    Parameters:
-    st_data (pd.DataFrame): The dataset containing the variable.
-    var (str): The name of the variable to calculate metrics for.
+#     Parameters:
+#     st_data (pd.DataFrame): The dataset containing the variable.
+#     var (str): The name of the variable to calculate metrics for.
 
-    Returns:
-    pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
-    """
+#     Returns:
+#     pd.DataFrame: A DataFrame containing the calculated metrics for the variable.
+#     """
     
-    # Compile metrics
-    df = pd.DataFrame({
-        'Average number of hot days': np.nanmean(annual_hot),
-        'Change in average number of hot days per decade': float(TRENDS[1]*10),
-        'Average number of hot days (1951-1962)': np.nanmean(annual_hot.loc['1951':'1962']),
-        'Average number of hot days (1981-1992)': np.nanmean(annual_hot.loc['1981':'1992']),
-        'Average number of hot days (2012 - 2021)': np.nanmean(annual_hot.loc['2012':'2021']),
-        'Maximum number of hot days': int(np.nanmax(annual_hot)),
-        'Year with maximum number of hot days': annual_hot['Perc_Anom'].idxmax().year,
-        '-- ': '--', 
+#     # Compile metrics
+#     df = pd.DataFrame({
+#         'Average number of hot days': np.nanmean(annual_hot),
+#         'Change in average number of hot days per decade': float(TRENDS[1]*10),
+#         'Average number of hot days (1951-1962)': np.nanmean(annual_hot.loc['1951':'1962']),
+#         'Average number of hot days (1981-1992)': np.nanmean(annual_hot.loc['1981':'1992']),
+#         'Average number of hot days (2012 - 2021)': np.nanmean(annual_hot.loc['2012':'2021']),
+#         'Maximum number of hot days': int(np.nanmax(annual_hot)),
+#         'Year with maximum number of hot days': annual_hot['Perc_Anom'].idxmax().year,
+#         '-- ': '--', 
 
-        'Average number of cold nights': np.nanmean(annual_cold),
-        'Change in average number of cold nights per decade': float(TRENDS[0]*10),
-        'Average number of cold nights (1951-1962)': np.nanmean(annual_cold.loc['1951':'1962']),
-        'Average number of cold nights (1981-1992)': np.nanmean(annual_cold.loc['1981':'1992']),
-        'Average number of cold nights (2012 - 2021)': np.nanmean(annual_cold.loc['2012':'2021']),
-        'Maximum number of cold nights': int(np.nanmax(annual_cold)),
-        'Year with maximum number of cold nights': annual_cold['Perc_Anom'].idxmax().year,
+#         'Average number of cold nights': np.nanmean(annual_cold),
+#         'Change in average number of cold nights per decade': float(TRENDS[0]*10),
+#         'Average number of cold nights (1951-1962)': np.nanmean(annual_cold.loc['1951':'1962']),
+#         'Average number of cold nights (1981-1992)': np.nanmean(annual_cold.loc['1981':'1992']),
+#         'Average number of cold nights (2012 - 2021)': np.nanmean(annual_cold.loc['2012':'2021']),
+#         'Maximum number of cold nights': int(np.nanmax(annual_cold)),
+#         'Year with maximum number of cold nights': annual_cold['Perc_Anom'].idxmax().year,
         
 
-    }, index=['Stats'])
-    df.index.name = ' '
+#     }, index=['Stats'])
+#     df.index.name = ' '
     
-    return np.round(df, 3)
+#     return np.round(df, 3)
 
 
 
-def table_rain_a_summary(data):
-    """
-    Generate a summary table for rainfall data.
+# def table_rain_a_summary(data):
+#     """
+#     Generate a summary table for rainfall data.
 
-    Parameters:
-    data (pd.DataFrame): DataFrame containing rainfall data.
+#     Parameters:
+#     data (pd.DataFrame): DataFrame containing rainfall data.
 
-    Returns:
-    pd.DataFrame: Summary table with maximum accumulated rainfall and maximum daily precipitation.
-    """
+#     Returns:
+#     pd.DataFrame: Summary table with maximum accumulated rainfall and maximum daily precipitation.
+#     """
 
-    datag = (data.groupby(data.index.year).sum()/ data.groupby(data.index.year).count()) * 365
-    datag.index = pd.to_datetime(datag.index, format = '%Y')
+#     datag = (data.groupby(data.index.year).sum()/ data.groupby(data.index.year).count()) * 365
+#     datag.index = pd.to_datetime(datag.index, format = '%Y')
 
-    perc_wet_dry = data.groupby('wet_day').count()['PRCP'].values/len(data) * 100
+#     perc_wet_dry = data.groupby('wet_day').count()['PRCP'].values/len(data) * 100
 
-    daily_max = data.PRCP.max()
-    daily_max_date = data.PRCP.idxmax().date()
+#     daily_max = data.PRCP.max()
+#     daily_max_date = data.PRCP.idxmax().date()
 
-    data_2 = data.loc[data['wet_day_t'] == 1][['PRCP']]
-    data_over_th = data_2.groupby(data_2.index.year).count()
-    data_over_th.index = pd.to_datetime(data_over_th.index, format = '%Y')
-    year_th = data_over_th['PRCP'].idxmax().year
+#     data_2 = data.loc[data['wet_day_t'] == 1][['PRCP']]
+#     data_over_th = data_2.groupby(data_2.index.year).count()
+#     data_over_th.index = pd.to_datetime(data_over_th.index, format = '%Y')
+#     year_th = data_over_th['PRCP'].idxmax().year
 
-    acum_max = datag.PRCP.max()
-    acum__max_date = datag.PRCP.idxmax().year
+#     acum_max = datag.PRCP.max()
+#     acum__max_date = datag.PRCP.idxmax().year
 
-    # Compile metrics
-    df = pd.DataFrame({
-        '% dry days [<1mm]': perc_wet_dry[0],
-        '% wet days [>1mm]': perc_wet_dry[1],
-        '-':'--',
-        'Maximum Accumulated Rainfall [mm]': acum_max,
-        'Maximum Accumulated Rainfall year': acum__max_date,
-        '--':'--',
-        'Year with more days over 95th percentile': year_th,
-        '---':'--',
-        'Maximum Daily Precipitation [mm]': daily_max,
-        'Maximum Daily Precipitation Date': daily_max_date,
+#     # Compile metrics
+#     df = pd.DataFrame({
+#         '% dry days [<1mm]': perc_wet_dry[0],
+#         '% wet days [>1mm]': perc_wet_dry[1],
+#         '-':'--',
+#         'Maximum Accumulated Rainfall [mm]': acum_max,
+#         'Maximum Accumulated Rainfall year': acum__max_date,
+#         '--':'--',
+#         'Year with more days over 95th percentile': year_th,
+#         '---':'--',
+#         'Maximum Daily Precipitation [mm]': daily_max,
+#         'Maximum Daily Precipitation Date': daily_max_date,
         
-    }, index=['Stats'])
-    df.index.name = ' '
+#     }, index=['Stats'])
+#     df.index.name = ' '
 
-    return np.round(df, 2)
-
-
-def table_rain_dry_summary(data):
-    """
-    Generate a summary table for rainfall data.
-
-    Parameters:
-    data (pd.DataFrame): DataFrame containing rainfall data.
-
-    Returns:
-    pd.DataFrame: Summary table with maximum accumulated rainfall and maximum daily precipitation.
-    """
-
-    data_dry = data.groupby(data.index.year)[['consecutive_days']].max()
+#     return np.round(df, 2)
 
 
-    number_max = data_dry.consecutive_days.max()
-    number_max_date = data_dry.consecutive_days.idxmax()
+# def table_rain_dry_summary(data):
+#     """
+#     Generate a summary table for rainfall data.
 
-    number_mean = data_dry.consecutive_days.mean()
+#     Parameters:
+#     data (pd.DataFrame): DataFrame containing rainfall data.
+
+#     Returns:
+#     pd.DataFrame: Summary table with maximum accumulated rainfall and maximum daily precipitation.
+#     """
+
+#     data_dry = data.groupby(data.index.year)[['consecutive_days']].max()
+
+
+#     number_max = data_dry.consecutive_days.max()
+#     number_max_date = data_dry.consecutive_days.idxmax()
+
+#     number_mean = data_dry.consecutive_days.mean()
  
 
-    # Compile metrics
-    df = pd.DataFrame({
+#     # Compile metrics
+#     df = pd.DataFrame({
 
-        'Maximum Number of Consecutive Dry Days': number_max,
-        'Year': number_max_date,
+#         'Maximum Number of Consecutive Dry Days': number_max,
+#         'Year': number_max_date,
 
-        'Mean Number of Consecutive Dry Days': number_mean,
+#         'Mean Number of Consecutive Dry Days': number_mean,
         
-    }, index=['Stats'])
-    df.index.name = ' '
+#     }, index=['Stats'])
+#     df.index.name = ' '
 
-    return np.round(df, 2)
+#     return np.round(df, 2)
 
 
 
@@ -362,17 +362,40 @@ def style_matrix(df_metrics, title = "Key Metrics Summary"):
 
 
 
+## CO2 TABLES ##
+
+def table_co2(MLO_data, trend):
+
+    data = MLO_data.dropna()
+
+    metrics = {
+        "Metric": [
+            "Mean CO2 Concentration (ppm)",
+            "Change in CO2 Concentration since 1951 (ppm)",
+            "Rate of Change in CO2 Concentration (ppm/year)",   
+        ],
+        "Value": [
+            data.CO2.mean(),
+            trend[0] * (data.index.year[-1] - 1951),
+            trend[0],
+
+        ]
+    }
+
+    df_metrics = pd.DataFrame(metrics)
+    return df_metrics
+
 ## TEMPERATURE TABLES ##
 
 def table_temp_11(df1, trend):
     mean_temp = df1.tmean.mean()
-    change_annual_mean_temp = trend * (df1.index.year[-1] - 1960)
+    change_annual_mean_temp = trend * (df1.index.year[-1] - 1951)
     rate_change = trend
 
     metrics = {
         "Metric": [
             "Mean Temperature",
-            "Change in Annual Mean Temperature since 1960",
+            "Change in Annual Mean Temperature since 1951",
             "Rate of Change (°C/year)"
         ],
         "Value": [
@@ -392,19 +415,19 @@ def table_temp_12(st_data, trend_maximum, trend_minimum):
     metrics = {
         "Metric": [
             "Annual Maximum Temperature (°C)",
-            "Change in Annual Maximum Temperature since 1960",
+            "Change in Annual Maximum Temperature since 1951",
             "Rate of Change in Annual Maximum Temperature (°C/year)",
             "Annual Minimum Temperature (°C)",
-            "Change in Annual Minimum Temperature since 1960",
+            "Change in Annual Minimum Temperature since 1951",
             "Rate of Change in Annual Minimum Temperature (°C/year)"
         ],
         "Value": [
             st_data.TMAX.max(),
-            trend_maximum * (st_data.index.year[-1] - 1960),
+            trend_maximum * (st_data.index.year[-1] - 1951),
             trend_maximum,
 
             st_data.TMIN.min(),
-            trend_minimum * (st_data.index.year[-1] - 1960),
+            trend_minimum * (st_data.index.year[-1] - 1951),
             trend_minimum,
         ]
     }
@@ -505,23 +528,23 @@ def table_rain_21(data, trend_da_mean, trend_ac_an):
     metrics = {
         "Metric": [
             "Daily Precipitation Mean (mm)",
-            "Change in Daily Precipitation since 1960 (mm)",
+            "Change in Daily Precipitation since 1951 (mm)",
             "Rate of Change in Daily Precipitation (mm/year)",
             " ",
             "Mean Accumulated Annual Precipitation (mm)",
-            "Change in Accumulated Annual Precipitation since 1960 (mm)",
+            "Change in Accumulated Annual Precipitation since 1951 (mm)",
             "Rate of Change in Accumulated Annual Precipitation (mm/year)",
 
         ],
         "Value": [
             data.PRCP.mean(),
-            trend_da_mean[0] * (data.index.year[-1] - 1960) * 365,
+            trend_da_mean[0] * (data.index.year[-1] - 1951) * 365,
             trend_da_mean[0],
 
             np.nan,
             datag.PRCP.mean(),
             
-            trend_ac_an * (datag.index.year[-1] - 1960),
+            trend_ac_an * (datag.index.year[-1] - 1951),
             trend_ac_an,
         ]
     }
@@ -537,7 +560,7 @@ def table_rain_22(data, trend_dry_days, trend_max_ndays):
     metrics = {
         "Metric": [
             "Annual Average Number of Dry Days [<1mm]",
-            "Change in Number of Dry Days since 1960",
+            "Change in Number of Dry Days since 1951",
             "Rate of Change in Number of Dry Days (days/year)",
             "Average Number of Dry Days: 1951 - 1962",
             "Average Number of Dry Days: 2012 - 2021",
@@ -545,7 +568,7 @@ def table_rain_22(data, trend_dry_days, trend_max_ndays):
             " ",
 
             "Maximum number of consecutive dry days on record",
-            "Change in Maximum Consecutive Dry Days since 1960",
+            "Change in Maximum Consecutive Dry Days since 1951",
             "Rate of Change in Maximum Consecutive Dry Days (days/year)",
             "Average Annual Maximum Consecutive Dry Days: 1951 - 1962",
             "Average Annual Maximum Consecutive Dry Days: 2012 - 2021",
@@ -554,7 +577,7 @@ def table_rain_22(data, trend_dry_days, trend_max_ndays):
         ],
         "Value": [
             data.loc[data['wet_day_t'] == 0].groupby(data.loc[data['wet_day_t'] == 0].index.year).PRCP.count().mean(),
-            trend_dry_days * (data_dry.index.year.max() - 1960),
+            trend_dry_days * (data_dry.index.year.max() - 1951),
             trend_dry_days,
             data_dry.PRCP.loc['1951':'1962'].groupby(data_dry.loc['1951':'1962'].index.year).count().mean(),
             data_dry.PRCP.loc['2012':'2021'].groupby(data_dry.loc['2012':'2021'].index.year).count().mean(),
@@ -562,7 +585,7 @@ def table_rain_22(data, trend_dry_days, trend_max_ndays):
             np.nan,
 
             data.groupby(data.index.year)['consecutive_days'].max().max(),
-            trend_max_ndays * (data.index.year.max() - 1960),
+            trend_max_ndays * (data.index.year.max() - 1951),
             trend_max_ndays,
             data.groupby(data.index.year)['consecutive_days'].max().loc['1951':'1962'].mean(),
             data.groupby(data.index.year)['consecutive_days'].max().loc['2012':'2021'].mean()
@@ -579,14 +602,14 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
     metrics = {
         "Metric": [
             "Annual average of wet days",
-            "Change in number of wet days from 1960",
+            "Change in number of wet days from 1951",
             "Rate of change in number of wet days",
             "Average Number of Wet Days: 1951 - 1962",
             "Average Number of Wet Days: 2012 - 2021",
             f"Wet days in the wettest year: {data_wet.groupby(data_wet.index.year).count().iloc[data_wet.groupby(data_wet.index.year).count().PRCP.argmax()].name}",
             " ",
             "Annual average number of days with heavy rainfall (>95th percentile)",
-            "Change in number of heavy rainfall days from 1960",
+            "Change in number of heavy rainfall days from 1951",
             "Rate of change in number of heavy rainfall days",
             "Average Number of Heavy Rainfall Days: 1951 - 1962",
             "Average Number of Heavy Rainfall Days: 2012 - 2021",
@@ -595,7 +618,7 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
         ],
         "Value": [
             data_th_1mm.loc[data_th_1mm['wet_day_t'] == 1].groupby(data_th_1mm.loc[data_th_1mm['wet_day_t'] == 1].index.year).PRCP.count().mean(),
-            trend_wet * (data_wet.index.year.max() - 1960),
+            trend_wet * (data_wet.index.year.max() - 1951),
             trend_wet,
             data_wet.PRCP.loc['1951':'1962'].groupby(data_wet.loc['1951':'1962'].index.year).count().mean(),
             data_wet.PRCP.loc['2012':'2021'].groupby(data_wet.loc['2012':'2021'].index.year).count().mean(),
@@ -603,7 +626,7 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
             np.nan,
 
             data_th_95.loc[data_th_95['wet_day_t'] == 1].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].index.year).PRCP.count().mean(),
-            trend_95 * (data_th_95.index.year.max() - 1960),
+            trend_95 * (data_th_95.index.year.max() - 1951),
             trend_95,
             data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1951':'1962'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1951':'1962'].index.year).PRCP.count().mean(),
             data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2021'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2021'].index.year).PRCP.count().mean(),

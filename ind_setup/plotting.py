@@ -171,11 +171,13 @@ def plot_bar_probs(x, y, bar_label = None, labels = None, trendline = False,
         time = x
         time_num = time
         # Fit a trendline (degree 1 polynomial)
-        coefficients = np.polyfit(time_num, y, 1)  # Linear fit
+        mask = np.isfinite(y)
+
+
+        coefficients = np.polyfit(time_num[mask], y[mask], 1)  # Linear fit
 
         trendline = np.poly1d(coefficients)  # Create trendline function
-        _, _, _, p_value, _ = linregress(time_num, y)
-
+        _, _, _, p_value, _ = linregress(time_num[mask], y[mask])
 
         change_rate = coefficients[0]
         trend = np.round(change_rate, 3)
@@ -425,7 +427,8 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot = True):
         .reindex(columns=categories, fill_value=0))
 
     # --- Ensure every year in full range appears ---
-    years = range(df_tcs['year'].min(), df_tcs['year'].max() + 1)
+    # years = range(df_tcs['year'].min(), df_tcs['year'].max() + 1)
+    years = range(df_tcs['year'].min(), 2025 + 1)
     counts = counts.reindex(years, fill_value=0)
 
     # --- Plot with colors aligned to category order ---
