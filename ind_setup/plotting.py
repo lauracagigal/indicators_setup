@@ -444,8 +444,8 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot = True):
     #trendline
     x = df_tcs.groupby('year').count().index  # Esto es lo que Pandas usa en el bar plot
     x = np.arange(len(x))
+    x = df_tcs.groupby('year').count().index - df_tcs.groupby('year').count().index[0]
     y = df_tcs.groupby('year').month.count().values
-
 
     coefficients = np.polyfit(x, y, 1)  # Linear fit
     trendline = np.poly1d(coefficients)  # Create trendline function
@@ -456,7 +456,6 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot = True):
     trend = np.round(change_rate, 3)
 
     if trendline_plot:
-
         if p_value < 0.05:
             label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Significant (p < 0.05)'
             ax.plot(x, trendline(x), color='k', linestyle='-', label=label)
