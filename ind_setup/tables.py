@@ -410,7 +410,7 @@ def table_temp_11(df1, trend):
 
 
 
-def table_temp_12(st_data, trend_maximum, trend_minimum):
+def table_temp_12(st_data, st_data_daily, trend_maximum, trend_minimum):
 
     metrics = {
         "Metric": [
@@ -419,7 +419,10 @@ def table_temp_12(st_data, trend_maximum, trend_minimum):
             "Rate of Change in Annual Maximum Temperature (°C/year)",
             "Annual Minimum Temperature (°C)",
             "Change in Annual Minimum Temperature since 1951",
-            "Rate of Change in Annual Minimum Temperature (°C/year)"
+            "Rate of Change in Annual Minimum Temperature (°C/year)",
+            "Mean Daily Mean Temperature (°C)",
+            "Mean Daily Maximum Temperature (°C)",  
+            "Mean Daily Minimum Temperature (°C)"
         ],
         "Value": [
             st_data.TMAX.max(),
@@ -429,6 +432,9 @@ def table_temp_12(st_data, trend_maximum, trend_minimum):
             st_data.TMIN.min(),
             trend_minimum * (st_data.index.year[-1] - 1951),
             trend_minimum,
+            st_data_daily.TMEAN.mean(),
+            st_data_daily.TMAX.mean(),
+            st_data_daily.TMIN.mean()
         ]
     }
 
@@ -845,3 +851,83 @@ def table_tcs_32b(tcs_WP, oni):
 
     df_metrics = pd.DataFrame(metrics)
     return df_metrics
+
+
+## OCEAN TABLES ##
+
+def celsius_to_fahrenheit(celsius):
+    return (celsius * 9/5) + 32
+
+def table_ocean(data, trend, data_oni, var = None):
+
+    try:
+        data_mean = data.mean(dim = ['lon', 'lat']).to_dataframe()
+    except:
+        data_mean = data[var].mean(dim = ['longitude', 'latitude']).to_dataframe()
+
+    if var == 'sst': 
+        unit = '°C'
+        unit_rate = '°C per year'
+        freq = 'Daily'
+    elif var == 'ph':
+        unit = 'pH'
+        unit_rate = 'pH per year'
+        freq = 'Monthly'
+    elif var == 'chlor_a':
+        unit = 'mg/m3'
+        unit_rate = 'mg/m3 per year'
+        freq = 'Monthly'
+    elif var == 'MD50':
+        unit = 'µm ESD'
+        unit_rate = 'µm ESD per year'
+        freq = 'Monthly'
+    elif var == 'o2':
+        unit = 'µmol/l'
+        unit_rate = 'µmol/l per year'
+        freq = 'Monthly'
+    else:
+        unit = ' '
+        unit_rate = ' '
+        freq = ' '
+
+    metrics = {
+        "Metric": [
+            f'{freq} Average',
+            f'{freq} Maximum',
+            f'{freq} Minimum',
+            'Maximum Annual Average',
+            'Minimum Annual Average',
+            f'Rate of change [{unit}/year]'.format(unit=unit_rate),
+            f'Decrease between {data_mean.index.year[0]} and {data_mean.index.year[-1]} [{unit}]',
+            '',
+            f'Average La Niña {var}',
+            f'Average El Niño {var}',
+            f'Average Neutral {var}'
+
+        ],
+        "Value": [
+            data_mean.mean().values[0],
+            data_mean.max().values[0],
+            data_mean.min().values[0],
+            data_mean.resample('YE').mean().max().values[0],
+            data_mean.resample('YE').mean().min().values[0],
+            trend,
+            trend * (data_mean.index.year[-1] - data_mean.index.year[0]),
+            np.nan,
+
+            data_oni.sel(ONI_cat = -1)[var].mean().values,  # Average niña
+            data_oni.sel(ONI_cat = 1)[var].mean().values,   # Average niño
+            data_oni.sel(ONI_cat = 0)[var].mean().values    # Average neutral
+
+        ]
+    }
+
+    df_metrics = pd.DataFrame(metrics)
+    # print(celsius_to_fahrenheit(df_metrics['Value']))
+    
+    return df_metrics
+
+
+
+
+
