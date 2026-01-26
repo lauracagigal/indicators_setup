@@ -239,7 +239,7 @@ def plot_base_map(shp_eez = None, ax = None, figsize=[10, 6]):
 
 
 def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vmax=.3, 
-                      sub_plot = None, figsize = (17, 20), cbar = None, cbar_pad = -0.02, titles = None):
+                      sub_plot = None, figsize = (17, 23), cbar = None, cbar_pad = 0.03, titles = None): #cbar_pad = -0.02
     
     """
     Plots subplots of a map for each year in the given dataset.
@@ -314,7 +314,7 @@ def plot_map_subplots(data_an, var, shp_eez = None, cmap='RdBu_r', vmin=-.3, vma
 
     if cbar is not None:
         if var == 'o2':
-            label = 'Oxygen (µmol/kg)'
+            label = 'Oxygen (µmol/l)'
         elif var == 'MD50':
             label = 'MD50 (µm ESD)'
         else:
@@ -569,3 +569,48 @@ def plot_dhw(data_crw):
             linestyle = ':', label = 'DHW thresholds: 2 and 4')
     
     return fig, ax2
+
+
+def plot_dhw_bleaching_levels(df, days_pivot):
+
+    level_order = [
+    "No stress",
+    "Bleaching Watch",
+    "Bleaching Warning",
+    "Alert level 1",
+    "Alert level 2"
+    ]   
+
+    fig, ax = plt.subplots(figsize=(14, 3))
+
+    x = np.arange(len(level_order))
+    width = 0.35
+
+    ax.bar(
+        x - width / 2,
+        days_pivot["First 10 years"]/10,
+        width,
+        label=f"First 10 years {np.sort(df['year'].unique())[:10][0]}- {np.sort(df['year'].unique())[:10][-1]}",
+        alpha=0.85,
+        color="coral",
+    )
+
+    ax.bar(
+        x + width / 2,
+        days_pivot["Last 10 years"]/10,
+        width,
+        label=f"Last 10 years {np.sort(df['year'].unique())[-10:][0]}- {np.sort(df['year'].unique())[-10:][-1]}",
+        alpha=0.5,
+        color="navy",
+    )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(level_order, fontsize=12)
+    ax.set_ylabel("Average number of days/year", fontsize=11)
+    ax.set_title("Bleaching alert days\nFirst 10 years vs Last 10 years", fontsize=14)
+    ax.legend(fontsize=12)
+    ax.grid(axis="y", alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+    return fig, days_pivot

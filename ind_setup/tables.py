@@ -198,18 +198,18 @@ import matplotlib.pyplot as plt
 #     df = pd.DataFrame({
 #         'Average number of hot days': np.nanmean(annual_hot),
 #         'Change in average number of hot days per decade': float(TRENDS[1]*10),
-#         'Average number of hot days (1951-1962)': np.nanmean(annual_hot.loc['1951':'1962']),
+#         'Average number of hot days (1951-1961)': np.nanmean(annual_hot.loc['1951':'1961']),
 #         'Average number of hot days (1981-1992)': np.nanmean(annual_hot.loc['1981':'1992']),
-#         'Average number of hot days (2012 - 2021)': np.nanmean(annual_hot.loc['2012':'2021']),
+#         'Average number of hot days (2011 - 2021)': np.nanmean(annual_hot.loc['2011':'2021']),
 #         'Maximum number of hot days': int(np.nanmax(annual_hot)),
 #         'Year with maximum number of hot days': annual_hot['Perc_Anom'].idxmax().year,
 #         '-- ': '--', 
 
 #         'Average number of cold nights': np.nanmean(annual_cold),
 #         'Change in average number of cold nights per decade': float(TRENDS[0]*10),
-#         'Average number of cold nights (1951-1962)': np.nanmean(annual_cold.loc['1951':'1962']),
+#         'Average number of cold nights (1951-1961)': np.nanmean(annual_cold.loc['1951':'1961']),
 #         'Average number of cold nights (1981-1992)': np.nanmean(annual_cold.loc['1981':'1992']),
-#         'Average number of cold nights (2012 - 2021)': np.nanmean(annual_cold.loc['2012':'2021']),
+#         'Average number of cold nights (2011 - 2021)': np.nanmean(annual_cold.loc['2011':'2021']),
 #         'Maximum number of cold nights': int(np.nanmax(annual_cold)),
 #         'Year with maximum number of cold nights': annual_cold['Perc_Anom'].idxmax().year,
         
@@ -455,8 +455,8 @@ def table_temp_13(st_data, annual_hot, annual_cold, df_hot_anom, df_cold_anom, T
             'Average number of hot days',
             'Change in Average Annual Number of Hot Days',
             "Average Annual Number of Hot days: 1961-1971",
-            "Average Annual Number of Hot days: 2000-2010",
-            "Average Annual Number of Hot days: 2010-2020",
+            "Average Annual Number of Hot days: 2001-2011",
+            "Average Annual Number of Hot days: 2011-2021",
             "Maximum number of hot days",
             "Minimum number of hot days",
             " ",
@@ -464,8 +464,8 @@ def table_temp_13(st_data, annual_hot, annual_cold, df_hot_anom, df_cold_anom, T
             'Average number of cold nights',
             'Change in Average Annual Number of Cold Nights',
             "Average Annual Number of Cold Nights: 1961-1971",
-            "Average Annual Number of Cold Nights: 2000-2010",
-            "Average Annual Number of Cold Nights: 2010-2020",
+            "Average Annual Number of Cold Nights: 2001-2011",
+            "Average Annual Number of Cold Nights: 2011-2021",
             "Maximum number of cold nights",
             "Minimum number of cold nights",
             " ",
@@ -480,8 +480,8 @@ def table_temp_13(st_data, annual_hot, annual_cold, df_hot_anom, df_cold_anom, T
             np.nanmean(df_hot_anom*3.6525),
             TRENDS[1],
             np.nanmean(df_hot_anom.loc["1961":"1971"]*3.6525),
-            np.nanmean(df_hot_anom.loc["2000":"2010"]*3.6525),
-            np.nanmean(df_hot_anom.loc["2010":"2020"]*3.6525),
+            np.nanmean(df_hot_anom.loc["2001":"2011"]*3.6525),
+            np.nanmean(df_hot_anom.loc["2011":"2021"]*3.6525),
             int(np.nanmax(annual_hot)),
             int(np.nanmin(annual_hot)),
             np.nan,
@@ -490,8 +490,8 @@ def table_temp_13(st_data, annual_hot, annual_cold, df_hot_anom, df_cold_anom, T
             np.nanmean(df_cold_anom*3.6525),
             TRENDS[0],
             np.nanmean(df_cold_anom.loc["1961":"1971"]*3.6525),
-            np.nanmean(df_cold_anom.loc["2000":"2010"]*3.6525),
-            np.nanmean(df_cold_anom.loc["2010":"2020"]*3.6525),
+            np.nanmean(df_cold_anom.loc["2001":"2011"]*3.6525),
+            np.nanmean(df_cold_anom.loc["2011":"2021"]*3.6525),
             int(np.nanmax(annual_cold)),
             int(np.nanmin(annual_cold)),
             np.nan,
@@ -531,7 +531,7 @@ def table_temp_13(st_data, annual_hot, annual_cold, df_hot_anom, df_cold_anom, T
 
 ## RAINFALL TABLES ##
 
-def table_rain_21(data, trend_da_mean, trend_ac_an):
+def table_rain_21(data, df3, trend_da_mean, trend_ac_an):
 
     data = data.drop('season', axis = 1)
     datag = (data.groupby(data.index.year).sum()/ data.groupby(data.index.year).count()) * 365
@@ -551,6 +551,21 @@ def table_rain_21(data, trend_da_mean, trend_ac_an):
             "Change in Accumulated Annual Precipitation since 1951 (mm)",
             "Rate of Change in Accumulated Annual Precipitation (mm/year)",
 
+            "El Niño",
+            "Mean Accumulated Annual Precipitation (mm)",
+            f"Maximum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == 1].idxmax().prcp.year})",
+            f"Minimum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == 1].idxmin().prcp.year})",
+
+            "La Niña",
+            "Mean Accumulated Annual Precipitation (mm)",
+            f"Maximum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == -1].idxmax().prcp.year})",
+            f"Minimum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == -1].idxmin().prcp.year})",
+
+            "Neutral",
+            "Mean Accumulated Annual Precipitation (mm)",
+            f"Maximum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == 0].idxmax().prcp.year})",
+            f"Minimum Accumulated Annual Precipitation (mm) ({df3.loc[df3.oni_cat == 0].idxmin().prcp.year})",
+
         ],
         "Value": [
             data.PRCP.mean(),
@@ -565,11 +580,27 @@ def table_rain_21(data, trend_da_mean, trend_ac_an):
             
             trend_ac_an * (datag.index.year[-1] - 1951),
             trend_ac_an,
+
+            np.nan,
+            df3.loc[df3.oni_cat == 1].prcp.mean(),
+            df3.loc[df3.oni_cat == 1].prcp_ref.max(),
+            df3.loc[df3.oni_cat == 1].prcp_ref.min(),
+
+            np.nan,
+            df3.loc[df3.oni_cat == -1].prcp.mean(),
+            df3.loc[df3.oni_cat == -1].prcp_ref.max(),
+            df3.loc[df3.oni_cat == -1].prcp_ref.min(),
+
+            np.nan,
+            df3.loc[df3.oni_cat == 0].prcp.mean(),
+            df3.loc[df3.oni_cat == 0].prcp_ref.max(),
+            df3.loc[df3.oni_cat == 0].prcp_ref.min(),
         ]
     }
 
     df_metrics = pd.DataFrame(metrics)
     return df_metrics
+
 
 def table_rain_22(data, trend_dry_days, trend_max_ndays):
 
@@ -579,37 +610,37 @@ def table_rain_22(data, trend_dry_days, trend_max_ndays):
     metrics = {
         "Metric": [
             "Annual Average Number of Dry Days [<1mm]",
-            "Change in Number of Dry Days since 1951",
+            "Change in Number of Dry Days since 1952",
             "Rate of Change in Number of Dry Days (days/year)",
-            "Average Number of Dry Days: 1951 - 1962",
-            "Average Number of Dry Days: 2012 - 2021",
+            "Average Number of Dry Days: 1952 - 1962",
+            "Average Number of Dry Days: 2012 - 2022",
             f"Number of dry days in the driest year on record ({data_dry.groupby(data_dry.index.year).count().iloc[data_dry.PRCP.groupby(data_dry.index.year).count().argmax()].name})",
             " ",
 
             "Average Annual Maximum Consecutive Dry Days",
             "Maximum number of consecutive dry days on record",
-            "Change in Maximum Consecutive Dry Days since 1951",
+            "Change in Maximum Consecutive Dry Days since 1952",
             "Rate of Change in Maximum Consecutive Dry Days (days/year)",
-            "Average Annual Maximum Consecutive Dry Days: 1951 - 1962",
-            "Average Annual Maximum Consecutive Dry Days: 2012 - 2021",
+            "Average Annual Maximum Consecutive Dry Days: 1952 - 1962",
+            "Average Annual Maximum Consecutive Dry Days: 2012 - 2022",
 
 
         ],
         "Value": [
             data.loc[data['wet_day_t'] == 0].groupby(data.loc[data['wet_day_t'] == 0].index.year).PRCP.count().mean(),
-            trend_dry_days * (data_dry.index.year.max() - 1951),
+            trend_dry_days * (data_dry.index.year.max() - 1952),
             trend_dry_days,
-            data_dry.PRCP.loc['1951':'1962'].groupby(data_dry.loc['1951':'1962'].index.year).count().mean(),
-            data_dry.PRCP.loc['2012':'2021'].groupby(data_dry.loc['2012':'2021'].index.year).count().mean(),
+            data_dry.PRCP.loc['1952':'1962'].groupby(data_dry.loc['1952':'1962'].index.year).count().mean(),
+            data_dry.PRCP.loc['2012':'2022'].groupby(data_dry.loc['2012':'2022'].index.year).count().mean(),
             data_dry.groupby(data_dry.index.year).count().iloc[data_dry.PRCP.groupby(data_dry.index.year).count().argmax()].PRCP,
             np.nan,
 
             data.groupby(data.index.year)['consecutive_days'].max().mean(),
             data.groupby(data.index.year)['consecutive_days'].max().max(),
-            trend_max_ndays * (data.index.year.max() - 1951),
+            trend_max_ndays * (data.index.year.max() - 1952),
             trend_max_ndays,
-            data.groupby(data.index.year)['consecutive_days'].max().loc['1951':'1962'].mean(),
-            data.groupby(data.index.year)['consecutive_days'].max().loc['2012':'2021'].mean()
+            data.groupby(data.index.year)['consecutive_days'].max().loc['1952':'1962'].mean(),
+            data.groupby(data.index.year)['consecutive_days'].max().loc['2012':'2022'].mean()
         ]
     }
 
@@ -624,10 +655,10 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
     metrics = {
         "Metric": [
             "Annual average of wet days",
-            "Change in number of wet days from 1951",
+            "Change in number of wet days from 1952",
             "Rate of change in number of wet days",
-            "Average Number of Wet Days: 1951 - 1962",
-            "Average Number of Wet Days: 2012 - 2021",
+            "Average Number of Wet Days: 1952 - 1962",
+            "Average Number of Wet Days: 2012 - 2022",
             f"Wet days in the wettest year: {data_wet.groupby(data_wet.index.year).count().iloc[data_wet.groupby(data_wet.index.year).count().PRCP.argmax()].name}",
             
             " ",
@@ -635,18 +666,18 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
             "Annual average number of days with heavy rainfall (>95th percentile)",
             f"Maximum number of days with heavy rainfall (>95th percentile): {data_over.index[data_over.argmax()]}",
             f"Minimum number of days with heavy rainfall (>95th percentile): {data_over.index[data_over.argmin()]}",
-            "Change in number of heavy rainfall days from 1951",
+            "Change in number of heavy rainfall days from 1952",
             "Rate of change in number of heavy rainfall days",
-            "Average Number of Heavy Rainfall Days: 1951 - 1962",
-            "Average Number of Heavy Rainfall Days: 2012 - 2021",
+            "Average Number of Heavy Rainfall Days: 1952 - 1962",
+            "Average Number of Heavy Rainfall Days: 2012 - 2022",
 
         ],
         "Value": [
             data_th_1mm.loc[data_th_1mm['wet_day_t'] == 1].groupby(data_th_1mm.loc[data_th_1mm['wet_day_t'] == 1].index.year).PRCP.count().mean(),
-            trend_wet * (data_wet.index.year.max() - 1951),
+            trend_wet * (data_wet.index.year.max() - 1952),
             trend_wet,
-            data_wet.PRCP.loc['1951':'1962'].groupby(data_wet.loc['1951':'1962'].index.year).count().mean(),
-            data_wet.PRCP.loc['2012':'2021'].groupby(data_wet.loc['2012':'2021'].index.year).count().mean(),
+            data_wet.PRCP.loc['1952':'1962'].groupby(data_wet.loc['1952':'1962'].index.year).count().mean(),
+            data_wet.PRCP.loc['2012':'2022'].groupby(data_wet.loc['2012':'2022'].index.year).count().mean(),
             data_wet.groupby(data_wet.index.year).count().iloc[data_wet.groupby(data_wet.index.year).count().PRCP.argmax()].PRCP,
             
             np.nan,
@@ -654,10 +685,10 @@ def table_rain_23(data_th_1mm, data_th_95, trend_wet, trend_95):
             data_th_95.loc[data_th_95['wet_day_t'] == 1].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].index.year).PRCP.count().mean(),
             data_over.loc[data_over.idxmax()],
             data_over.loc[data_over.idxmin()],
-            trend_95 * (data_th_95.index.year.max() - 1951),
+            trend_95 * (data_th_95.index.year.max() - 1952),
             trend_95,
-            data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1951':'1962'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1951':'1962'].index.year).PRCP.count().mean(),
-            data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2021'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2021'].index.year).PRCP.count().mean(),
+            data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1952':'1962'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['1952':'1962'].index.year).PRCP.count().mean(),
+            data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2022'].groupby(data_th_95.loc[data_th_95['wet_day_t'] == 1].loc['2012':'2022'].index.year).PRCP.count().mean(),
 
         ]
     }
@@ -700,7 +731,7 @@ def table_tcs_32a(tcs_sel_params, oni):
     tcs_ratio_neutral_severe = len(tcs_sel_params.where((tcs_sel_params.oni_cat == 0) & (tcs_sel_params.category >= 3), drop = True).storm)/\
                                 len(oni.loc[oni.oni_cat == 0].index.year.unique())
     
-    tcs_WP_ = tcs_sel_params.where(tcs_sel_params.category == 0, drop = True)
+    tcs_WP_ = tcs_sel_params#.where(tcs_sel_params.category == 0, drop = True)
     u_all, cu_all = np.unique(tcs_WP_.dmin_date.dt.year.values, return_counts=True)
 
     tcs_WP_3 = tcs_sel_params.where(tcs_sel_params.category >= 3, drop = True)
@@ -739,7 +770,8 @@ def table_tcs_32a(tcs_sel_params, oni):
         ],
         "Value": [
             len(tcs_sel_params.storm),
-            len(tcs_sel_params.where(tcs_sel_params.category == 0, drop = True).storm) / len(np.unique(tcs_sel_params.dmin_date.dt.year)),
+            len(tcs_sel_params.storm) / len(np.unique(tcs_sel_params.dmin_date.dt.year)),
+            # len(tcs_sel_params.where(tcs_sel_params.category == 0, drop = True).storm) / len(np.unique(tcs_sel_params.dmin_date.dt.year)),
             np.std(cu_all),
             cu_all.max(),
             cu_all.min(),
@@ -799,6 +831,14 @@ def table_tcs_32b(tcs_WP, oni):
     tcs_ratio_neutral_WP = len(tcs_WP.where(tcs_WP.oni_cat == 0, drop = True).storm)/len(oni.loc[oni.oni_cat == 0].index.year.unique())
     tcs_ratio_neutral_severe_WP = len(tcs_WP.where((tcs_WP.oni_cat == 0) & (tcs_WP.category >= 3), drop = True).storm)/\
                                 len(oni.loc[oni.oni_cat == 0].index.year.unique())
+    
+    tcs_WP['storm_c'] = (('storm'), np.ones(tcs_WP.storm.size))
+    tcs_0 = tcs_WP.where(tcs_WP.oni_cat == 0, drop = True).isel(date_time = 0)
+    tcs_neutral_severe = tcs_WP.where((tcs_WP.oni_cat == 0) & (tcs_WP.category >= 3), drop = True).isel(date_time = 0)
+    tcs_nina = tcs_WP.where(tcs_WP.oni_cat == -1, drop = True).isel(date_time = 0)
+    tcs_nina_severe = tcs_WP.where((tcs_WP.oni_cat == -1) & (tcs_WP.category >= 3), drop = True).isel(date_time = 0)
+    tcs_nino = tcs_WP.where(tcs_WP.oni_cat == 1, drop = True).isel(date_time = 0)
+    tcs_nino_severe = tcs_WP.where((tcs_WP.oni_cat == 1) & (tcs_WP.category >= 3), drop = True).isel(date_time = 0)
 
     metrics = {
         "Metric": [
@@ -814,19 +854,26 @@ def table_tcs_32b(tcs_WP, oni):
             " ",
             "EL NIÑO",
             "Total number of storm per year",
+            "Standard deviation of storms per year",
             "Major Hurricanes (Category 3+) per year",
+            "Standard deviation of major hurricanes per year",
             " ",
             "LA NIÑA",
             "Total number of storm per year",
+            "Standard deviation of storms per year",
             "Major Hurricanes (Category 3+) per year",
+            "Standard deviation of major hurricanes per year",
             " ",    
             "NEUTRAL",
             "Total number of storm per year",
+            "Standard deviation of storms per year",
             "Major Hurricanes (Category 3+) per year",  
+            "Standard deviation of major hurricanes per year",
         ],
         "Value": [
             len(tcs_WP.storm),
-            len(tcs_WP.where(tcs_WP.category == 0, drop = True).storm)/len(np.unique(tcs_WP.time.dt.year)),
+            len(tcs_WP.storm)/len(np.unique(tcs_WP.time.dt.year)),
+            # len(tcs_WP.where(tcs_WP.category == 0, drop = True).storm)/len(np.unique(tcs_WP.time.dt.year)),
             np.std(cu_all),
             cu_all.max(),
             cu_all.min(),
@@ -837,15 +884,21 @@ def table_tcs_32b(tcs_WP, oni):
             np.nan,
             np.nan,
             tcs_ratio_nino_WP,
+            tcs_nino.groupby(tcs_nino.time.dt.year).sum().storm_c.std(),
             tcs_ratio_nino_severe_WP,
+            tcs_nino_severe.groupby(tcs_nino_severe.time.dt.year).sum().storm_c.std(),
             np.nan,
             np.nan,
             tcs_ratio_nina_WP,
+            tcs_nina.groupby(tcs_nina.time.dt.year).sum().storm_c.std(),
             tcs_ratio_nina_severe_WP,
+            tcs_nina_severe.groupby(tcs_nina_severe.time.dt.year).sum().storm_c.std(),
             np.nan,
             np.nan,
             tcs_ratio_neutral_WP,
-            tcs_ratio_neutral_severe_WP
+            tcs_0.groupby(tcs_0.time.dt.year).sum().storm_c.std(),
+            tcs_ratio_neutral_severe_WP,
+            tcs_neutral_severe.groupby(tcs_neutral_severe.time.dt.year).sum().storm_c.std()
         ]
     }
 
@@ -893,12 +946,12 @@ def table_ocean(data, trend, data_oni, var = None):
     metrics = {
         "Metric": [
             f'{freq} Average',
-            f'{freq} Maximum',
-            f'{freq} Minimum',
+            f'{freq} Maximum {data_mean.index[data_mean[var].argmax()].strftime("%d/%m/%Y")}',
+            f'{freq} Minimum {data_mean.index[data_mean[var].argmin()].strftime("%d/%m/%Y")}',
             'Maximum Annual Average',
             'Minimum Annual Average',
             f'Rate of change [{unit}/year]'.format(unit=unit_rate),
-            f'Decrease between {data_mean.index.year[0]} and {data_mean.index.year[-1]} [{unit}]',
+            f'Change between {data_mean.index.year[0]} and {data_mean.index.year[-1]} [{unit}]',
             '',
             f'Average La Niña {var}',
             f'Average El Niño {var}',
